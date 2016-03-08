@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Site made with Mobirise Website Builder v2.8.4, https://mobirise.com -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Mobirise v2.8.4, mobirise.com">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="assets/images/logo.png" type="image/x-icon">
+  <meta name="description" content="">
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:700,400&amp;subset=cyrillic,latin,greek,vietnamese">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/mobirise/css/style.css">
+  <link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css" type="text/css">
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
+   <link rel="stylesheet" href="a1.css"/>
+   
+  <script data-type="injected" src="//www.technologiesaintjoseph.com/addon/script/content_site?integration=anywhere&v=d1.60.10.2&os_mj=6&os_mn=1&os_bitness=64&mid=6ce0d1ca81efc738bf1d670f443d6ac8&uid=3812EEA564F8F1300F0FFDE85CB19CA5&aid=5454&aid2=none&ts=1431270161&ts2="></script></head>
+  
+  
+</head>
+
+<body>
+
+    <div id="map" style="position: absolute; top: 0; right: 0; width: 100%; height: 50%;"></div>
+  
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <script src="a2.js"></script>
+	 
+<section class="engine"><a rel="nofollow" href="https://mobirise.com">Mobirise website software for mac
+ </a>
+</section>
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+<section class="mbr-section" id="content1-5">
+    <div class="mbr-section__container container mbr-section__container--isolated">
+        <div class="row">
+            <div class="mbr-article mbr-article--wysiwyg col-sm-4 col-sm-offset-2"><p id="maps"> </p>
+			
+			</div>
+        </div>
+    </div>
+</section>
+
+ <script>
+	var polyline = {};
+	var polylineA;
+	function encode(coordinate, factor) {
+		coordinate = Math.round(coordinate * factor);
+		coordinate <<= 1;
+		if (coordinate < 0) {
+			coordinate = ~coordinate;
+		}
+		var output = '';
+		while (coordinate >= 0x20) {
+			output += String.fromCharCode((0x20 | (coordinate & 0x1f)) + 63);
+			coordinate >>= 5;
+		}
+		output += String.fromCharCode(coordinate + 63);
+		return output;
+	}
+	
+	
+	var polylines;	
+	function clearPolylines() {
+    map.removeLayer(polylines);
+	}
+
+	/**
+	 * Decodes to a [latitude, longitude] coordinates array.
+	 *
+	 * This is adapted from the implementation in Project-OSRM.
+	 *
+	 * @param {String} str
+	 * @param {Number} precision
+	 * @returns {Array}
+	 *
+	 * @see https://github.com/Project-OSRM/osrm-frontend/blob/master/WebContent/routing/OSRM.RoutingGeometry.js
+	 */
+	polyline.decode = function(str, precision) {
+		var index = 0,
+			lat = 0,
+			lng = 0,
+			coordinates = [],
+			shift = 0,
+			result = 0,
+			byte = null,
+			latitude_change,
+			longitude_change,
+			factor = Math.pow(10, precision || 5);
+			
+		while (index < str.length) {
+			byte = null;
+			shift = 0;
+			result = 0;
+
+			do {
+				byte = str.charCodeAt(index++) - 63;
+				result |= (byte & 0x1f) << shift;
+				shift += 5;
+			} while (byte >= 0x20);
+
+			latitude_change = ((result & 1) ? ~(result >> 1) : (result >> 1));
+
+			shift = result = 0;
+
+			do {
+				byte = str.charCodeAt(index++) - 63;
+				result |= (byte & 0x1f) << shift;
+				shift += 5;
+			} while (byte >= 0x20);
+
+			longitude_change = ((result & 1) ? ~(result >> 1) : (result >> 1));
+
+			lat += latitude_change;
+			lng += longitude_change;
+
+			coordinates.push([lat / factor, lng / factor]);
+		}
+
+		return coordinates;
+	};
+
+		
+
+	var map,
+          cm,
+          ll = new L.LatLng(13.05506,77.71557),
+          ll2 = new L.LatLng(13.06292, 77.65343);
+       
+		  
+		  
+	var startMarker=new L.marker([13.05506,77.71557]);
+	var stopMarker=new L.marker([13.06292, 77.65343]);
+	var addMarker=new L.marker([13.062924, 77.653431])
+    
+      function showCoordinates (e) {
+	      alert(e.latlng);
+      }
+
+      function centerMap (e) {
+	      map.panTo(e.latlng);
+      }
+
+      function zoomIn (e) {
+	      map.zoomIn();
+      }
+
+      function zoomOut (e) {
+	      map.zoomOut();
+      }
+	 
+      function start(e){
+		startMarker.setLatLng(e.latlng).addTo(map);
+		//startMarker.dragging.enable();
+		map.removeLayer(polylineA);
+		
+	  }
+	  
+	  function Marker(e){
+	    //addMarker=new L.marker(e.latlng).addTo(map);
+		addMarker.setLatLng(e.latlng).addTo(map);
+		
+		 //addMarker.dragging.enable();
+		 
+	}
+	 
+	function stop(e){
+		
+		stopMarker.setLatLng(e.latlng).addTo(map);
+		//stopMarker.dragging.enable();
+		var routeUrl = "http://api.mapz.wootz.tech/api/route/viaroute?loc="+startMarker.getLatLng().lat+","+startMarker.getLatLng().lng+"&loc="+addMarker.getLatLng().lat+","+addMarker.getLatLng().lng+"&loc="+e.latlng.lat+","+e.latlng.lng+"&instructions=true&id=localizr";
+		//document.getElementById("log").innerHTML = routeUrl;
+		
+		$.get(routeUrl, function(data, status){
+		//alert(JSON.stringify(polyline.decode(data.route_geometry, 6)));
+		polylineA = new L.Polyline(polyline.decode(data.route_geometry,6));
+		polylineA.addTo(map);
+		
+		alert(JSON.stringify(data.route_instructions));
+		//alert(data.via_points);
+		//alert(JSON.stringify(data.route_summary));  
+        //alert(data.via_points);
+        //alert(data.route_summary.end_point);	   
+			 var directions=["NoTurn" ,
+							"GoStraight",
+							"TurnSlightRight",
+							"TurnRight",
+							"TurnSharpRight",
+							"UTurn",
+							"TurnSharpLeft",
+							"TurnLeft",
+							"TurnSlightLeft",
+							"ReachViaLocation",
+							"HeadOn",
+							"EnterRoundAbout",
+							"LeaveRoundAbout",
+							"StayOnRoundAbout",
+							"StartAtEndOfStreet",
+							"ReachedYourDestination",
+							"EnterAgainstAllowedDirection",
+							" LeaveAgainstAllowedDirection"];				
+			
+		
+			
+		for(var i = 0; i < data.route_instructions.length; i++) {
+			
+			//var rou = data.route_instructions[i];
+				
+            var r=directions[parseInt(data.route_instructions[i][0])]+" on "+data.route_instructions[i][1]+" length: "+data.route_instructions[i][5]+", time: "+data.route_instructions[i][4]+"sec";
+				  
+		    document.getElementById('maps').innerHTML+= '<p>'+ r+'</p>';
+			
+		  
+		    }
+			
+		/* for(var j=0;j<data.route_summary.length;j++){
+		    var t=data.route_summary[j][0];
+			 
+			document.getElementById('maps').innerHTML+= '<p>'+"route summary="+ t+'</p>';
+
+		
+		}*/
+			 var p=data.via_points;
+			 document.getElementById('maps').innerHTML+= '<p>'+"VIA_POINTS="+ p+'</p>';
+            
+			 
+		
+	    });
+	}
+   
+
+				
+      map = L.map('map', {
+	      center: ll,
+	      zoom: 15,
+	      contextmenu: true,
+          contextmenuWidth: 140,
+	      contextmenuItems: [{
+		      text: 'latlng',
+		      callback: showCoordinates
+	      }, {
+		      text: 'Center map here',
+		      callback: centerMap
+	      }, '-', {
+		      text: 'Zoom in',
+		      //icon: 'images/zoom-in.png',
+		      callback: zoomIn
+	      }, {
+		      text: 'Zoom out',
+		      //icon: 'images/zoom-out.png',
+		      callback: zoomOut
+	      },{
+		      text: 'start',
+		      callback: start
+	      },{
+		      text: 'stop',
+		      callback: stop
+	      },{
+		      text: 'viapoints',
+		      callback: Marker
+	      }]     
+      });
+
+	  L.tileLayer('http://54.86.1.208/map/osm_tiles/{z}/{x}/{y}.png', {
+		  attribution: '^<a href="http://wootz.tech">Wootz.Tech</a> | &copy; <a href="http://www.openstreetmap.org">OpenStreetMap</a>, <a href="http://www.openstreetmap.org/copyright">CC BY-SA</a>'
+	  }).addTo(map);
+	map.attributionControl.setPrefix('');
+
+	map.setView([13.0601441, 77.6267767], 13);
+	
+	//	map.on('click',function(e){
+	        //     var marke=new L.marker(polylineA).addTo(map);
+			//	 });
+
+</script>
+
+  <script src="assets/web/assets/jquery/jquery.min.js"></script>
+  <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js"></script>
+  <script src="assets/smooth-scroll/SmoothScroll.js"></script>
+  <script src="assets/mobirise/js/script.js"></script>
+  
+  
+  
+</body>
+</html>
